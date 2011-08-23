@@ -87,6 +87,27 @@ public class LGEStarRIL extends RIL implements CommandsInterface {
 
     public LGEStarRIL(Context context, int networkMode, int cdmaSubscription) {
         super(context, networkMode, cdmaSubscription);
+        /* The star needs to ignore SCREEN_X states, in order to keep the
+         * batt updates running. The cosmo doesn't need this */
+        if (!SystemProperties.get("ro.build.product").equals("p920")) {
+            context.unregisterReceiver(mIntentReceiver);
+            BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+                @Override
+                    public void onReceive(Context context, Intent intent) {
+                        if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                            Log.d(LOG_TAG, "RIL received ACTION_SCREEN_ON Intent -> SKIP");
+                        } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                            Log.d(LOG_TAG, "RIL received ACTION_SCREEN_OFF Intent -> SKIP");
+                        } else {
+                            Log.w(LOG_TAG, "RIL received unexpected Intent: " + intent.getAction());
+                        }
+                    }
+            };
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(Intent.ACTION_SCREEN_ON);
+            filter.addAction(Intent.ACTION_SCREEN_OFF);
+            context.registerReceiver(mIntentReceiver, filter);
+        }
     }
 
     protected boolean mPrepSetupPending = true;
@@ -872,15 +893,15 @@ public class LGEStarRIL extends RIL implements CommandsInterface {
         String response;
         SimpleDateFormat dateFormatter;
         SimpleDateFormat dateParser;
-        boolean isP990 = SystemProperties.get("ro.build.product").equals("p990");
+        boolean isIfx = !SystemProperties.get("ro.build.product").equals("p999");
 
         num = p.readInt(); // TZ diff in quarter-hours
 
         /* Get the actual date string */
         parceldata = p.readString();
 
-        /* P990 needs some additional hax... */
-        if (isP990) {
+        /* Infineon modems need some additional hax... */
+        if (isIfx) {
             /* Store DST before cropping */
             parcelextra = parceldata.substring(parceldata.lastIndexOf(",")+1);
             if (parcelextra != null) dst = Integer.parseInt(parcelextra);
@@ -894,8 +915,8 @@ public class LGEStarRIL extends RIL implements CommandsInterface {
             dateFormatter = new SimpleDateFormat("yy/MM/dd,HH:mm:ss");
             dateParser = new SimpleDateFormat("yy/MM/dd,HH:mm:ss");
 
-            /* P990 delivers localtime, convert to UTC */
-            if (isP990) {
+            /* Ifx delivers localtime, convert to UTC */
+            if (isIfx) {
                 /* Directly calculate UTC time using DST Offset */
                 long when = dateParser.parse(parceldata).getTime() - offset;
                 Date d = new Date(when);
@@ -911,7 +932,7 @@ public class LGEStarRIL extends RIL implements CommandsInterface {
 
         /* Append the timezone */
         response = response + ((num < 0) ? "" : "+") + num;
-        if (isP990) {
+        if (isIfx) {
             /* Add DST */
             response = response + "," + dst;
         }
