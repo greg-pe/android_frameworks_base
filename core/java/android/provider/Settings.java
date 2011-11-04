@@ -2677,6 +2677,7 @@ public final class Settings {
 
         /**
          * The TCP/IP port to run ADB on, or -1 for USB
+         * @hide
          */
         public static final String ADB_PORT = "adb_port";
 
@@ -2684,7 +2685,6 @@ public final class Settings {
          * Whether to display the ADB notification.
          */
         public static final String ADB_NOTIFY = "adb_notify";
-
 
         /**
          * Setting to allow mock locations and location provider status to be injected into the
