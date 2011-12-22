@@ -3208,13 +3208,8 @@ public class RIL extends BaseCommands implements CommandsInterface {
         return ret;
     }
 
-<<<<<<< HEAD
    protected Object
    responseCellList(Parcel p) {
-=======
-    private Object
-    responseCellList(Parcel p) {
->>>>>>> remotes/aosp/ics-mr1-release
        int num, rssi;
        String location;
        ArrayList<NeighboringCellInfo> response;
