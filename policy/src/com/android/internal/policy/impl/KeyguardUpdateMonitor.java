@@ -421,9 +421,10 @@ public class KeyguardUpdateMonitor {
         }
 
         // change where battery needs charging
-        if (!nowPluggedIn && isBatteryLow(current) && current.level != old.level) {
-            return true;
-        }
+        // commented next 3 lines out to allow battery % on lockscreen
+       // if (!nowPluggedIn && isBatteryLow(current) && current.level != old.level) {
+         //   return true;
+       // }
         return false;
     }
 
