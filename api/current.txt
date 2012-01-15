@@ -17441,7 +17441,6 @@ package android.provider {
     field public static final java.lang.String ACCESSIBILITY_ENABLED = "accessibility_enabled";
     field public static final java.lang.String ACCESSIBILITY_SPEAK_PASSWORD = "speak_password";
     field public static final java.lang.String ADB_ENABLED = "adb_enabled";
-    field public static final java.lang.String ADB_PORT = "adb_port";
     field public static final java.lang.String ALLOWED_GEOLOCATION_ORIGINS = "allowed_geolocation_origins";
     field public static final java.lang.String ALLOW_MOCK_LOCATION = "mock_location";
     field public static final java.lang.String ANDROID_ID = "android_id";
