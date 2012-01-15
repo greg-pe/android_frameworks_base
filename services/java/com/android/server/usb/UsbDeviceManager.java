@@ -290,10 +290,6 @@ public class UsbDeviceManager {
                                 false, new AdbSettingsObserver());
 
                 mContentResolver.registerContentObserver(
-                       Settings.Secure.getUriFor(Settings.Secure.ADB_PORT),
-                                false, new AdbSettingsObserver());
-
-                mContentResolver.registerContentObserver(
                         Settings.Secure.getUriFor(Settings.Secure.ADB_NOTIFY),
                                 false, new ContentObserver(null) {
                         public void onChange(boolean selfChange) {
