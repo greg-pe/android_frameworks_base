@@ -44,6 +44,18 @@ import com.android.internal.telephony.ITelephony;
 import android.util.Log;
 import android.view.WindowManager;
 import android.view.KeyEvent;
+import java.io.File;
+import java.util.List;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.lang.Runtime;
+import android.util.Log;
+import android.content.pm.IPackageManager;
+import android.content.pm.ApplicationInfo;
+import android.os.Bundle;
+import java.io.*;
 
 public final class ShutdownThread extends Thread {
     // constants
@@ -114,7 +126,7 @@ public final class ShutdownThread extends Thread {
                 dialog = new AlertDialog.Builder(context)
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setTitle(com.android.internal.R.string.reboot_system)
-                        .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options, 0, new DialogInterface.OnClickListener() {
+                        .setSingleChoiceItems(com.android.internal.R.array.shutdown_reboot_options, -1, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 if (which < 0)
                                     return;
@@ -128,7 +140,14 @@ public final class ShutdownThread extends Thread {
                         .setPositiveButton(com.android.internal.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 mReboot = true;
-                                beginShutdownSequence(context);
+				if (mRebootReason.equals("hotreboot"))
+				{
+					hotreboot();
+				}
+				else
+				{
+	                                beginShutdownSequence(context);
+				}
                             }
                         })
                         .setNegativeButton(com.android.internal.R.string.no, new DialogInterface.OnClickListener() {
@@ -466,4 +485,10 @@ public final class ShutdownThread extends Thread {
         Log.i(TAG, "Performing low-level shutdown...");
         Power.shutdown();
     }
+
+        public static void hotreboot() {                    
+               try{
+		Process process = Runtime.getRuntime().exec("killall system_server");
+		} catch (IOException e) {}
+        }
 }
