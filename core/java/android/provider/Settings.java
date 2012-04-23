@@ -2261,6 +2261,12 @@ public final class Settings {
         public static final String LOCKSCREEN_QUICK_UNLOCK_CONTROL = "lockscreen_quick_unlock_control";
 
         /**
+         * Stores values for custom lockscreen targets
+         * @hide
+         */
+        public static final String LOCKSCREEN_TARGETS = "lockscreen_targets";
+
+        /**
          * Whether to unlock the menu key.  The value is boolean (1 or 0).
          * @hide
          */
