@@ -102,7 +102,6 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
     private boolean mShowCombinedVolumes;
     private boolean mVoiceCapable;
     private int mCurrentOverlayStyle;
-    private boolean mHasNewOverlayStyle = false;
 
     /** Dialog containing all the sliders */
     private final Dialog mDialog;
@@ -260,7 +259,7 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
                 mCurrentOverlayStyle = Settings.System.VOLUME_OVERLAY_EXPANDABLE;
             }
         }
-        changeOverlayStyle(mCurrentOverlayStyle, true);
+        changeOverlayStyle(mCurrentOverlayStyle);
         mMoreButton.setOnClickListener(this);
 
         listenToRingerModeAndConfigChanges();
@@ -280,17 +279,14 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
                     sendMessage(obtainMessage(MSG_RINGER_MODE_CHANGED));
                 } else if (ACTION_VOLUME_OVERLAY_CHANGED.equals(action)) {
                     int state = (Integer) intent.getExtra("state");
-                    changeOverlayStyle(state, false);
+                    changeOverlayStyle(state);
                 }
             }
         }, filter);
     }
 
-    private void changeOverlayStyle(int newStyle, boolean isConstructorCall) {
+    private void changeOverlayStyle(int newStyle) {
         Log.i("VolumePanel", "changeOverlayStyle : " + newStyle);
-        // Don't change to the same style
-        if (!isConstructorCall && newStyle == mCurrentOverlayStyle) return;
-        mHasNewOverlayStyle = true;
         switch (newStyle) {
             case Settings.System.VOLUME_OVERLAY_SINGLE :
                 mMoreButton.setVisibility(View.GONE);
@@ -588,10 +584,6 @@ public class VolumePanel extends Handler implements OnSeekBarChangeListener, Vie
             // Showing dialog - use collapsed state
             if (mShowCombinedVolumes && mCurrentOverlayStyle != Settings.System.VOLUME_OVERLAY_EXPANDED) {
                 collapse();
-            }
-            // If just changed the style and we need to expand
-            if (mHasNewOverlayStyle && mCurrentOverlayStyle == Settings.System.VOLUME_OVERLAY_EXPANDED) {
-                expand();
             }
             mDialog.show();
         }
