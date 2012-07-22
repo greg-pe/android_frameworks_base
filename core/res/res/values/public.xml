@@ -3810,6 +3810,4 @@
   <java-symbol type="id" name="calendar_panel" />
   <java-symbol type="id" name="calendar_event_title" />
   <java-symbol type="id" name="calendar_event_details" />
-
->>>>>>> a6c11c9... Framework: Port CM9 features to CM10 (WIP) (Part 2 of 2)
 </resources>
