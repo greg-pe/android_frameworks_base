@@ -3671,6 +3671,7 @@
   <java-symbol type="bool" name="config_screenOffAnimation" />
   <java-symbol type="bool" name="config_hasRotationLockSwitch" />
   <java-symbol type="bool" name="config_noDelayInATwoDP" />
+  <java-symbol type="integer" name="config_deviceHardwareKeys" />
 
   <!-- Notification and battery light -->
   <java-symbol type="bool" name="config_intrusiveBatteryLed" />
