@@ -2659,7 +2659,19 @@ public final class Settings {
          * Whether power menu screenshot is enabled
          * @hide
          */
+        public static final String POWER_MENU_REBOOT_ENABLED = "power_menu_reboot_enabled";
+
+        /**
+         * Whether power menu screenshot is enabled
+         * @hide
+         */
         public static final String POWER_MENU_SCREENSHOT_ENABLED = "power_menu_screenshot_enabled";
+
+        /**
+         * Whether power menu screenshot is enabled
+         * @hide
+         */
+        public static final String POWER_MENU_PROFILES_ENABLED = "power_menu_profiles_enabled";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
@@ -2742,6 +2754,8 @@ public final class Settings {
             QUIET_HOURS_DIM,
             SYSTEM_PROFILES_ENABLED,
             POWER_MENU_SCREENSHOT_ENABLED,
+            POWER_MENU_REBOOT_ENABLED,
+            POWER_MENU_PROFILES_ENABLED,
         };
 
         // Settings moved to Settings.Secure
