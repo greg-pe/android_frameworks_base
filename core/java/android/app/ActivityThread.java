@@ -96,12 +96,6 @@ import android.view.WindowManager;
 import android.view.WindowManagerImpl;
 import android.renderscript.RenderScript;
 
-import com.android.internal.os.BinderInternal;
-import com.android.internal.os.RuntimeInit;
-import com.android.internal.os.SamplingProfilerIntegration;
-
-import org.apache.harmony.xnet.provider.jsse.OpenSSLSocketImpl;
-
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
@@ -165,6 +159,7 @@ public final class ActivityThread {
     static ContextImpl mSystemContext = null;
 
     static IPackageManager sPackageManager;
+    static IAssetRedirectionManager sAssetRedirectionManager;
 
     final ApplicationThread mAppThread = new ApplicationThread();
     final Looper mLooper = Looper.myLooper();
