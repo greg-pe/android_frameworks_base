@@ -2689,6 +2689,12 @@ public final class Settings {
         public static final String POWER_MENU_PROFILES_ENABLED = "power_menu_profiles_enabled";
 
         /**
+         * Whether power menu airplane mode is enabled
+         * @hide
+         */
+        public static final String POWER_MENU_AIRPLANEMODE_ENABLED = "power_menu_airplanemode_enabled";
+
+        /**
          * Whether to enable custom rebindings of the actions performed on
          * certain key press events.
          * @hide
