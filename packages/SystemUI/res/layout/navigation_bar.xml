@@ -167,10 +167,11 @@
                 android:layout_width="match_parent"
                 android:src="@drawable/ic_sysbar_lights_out_dot_large"
                 android:scaleType="center"
+                android:layout_weight="0"
                 />
             <View
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="match_parent"
                 android:visibility="invisible"
                 android:layout_weight="1"
                 />
