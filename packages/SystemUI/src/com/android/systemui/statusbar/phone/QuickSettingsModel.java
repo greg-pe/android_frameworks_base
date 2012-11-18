@@ -29,8 +29,11 @@ import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.drawable.Drawable;
 import android.hardware.display.WifiDisplayStatus;
+import android.media.AudioManager;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.UserHandle;
+import android.location.LocationManager;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
@@ -170,6 +173,26 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     private final NextAlarmObserver mNextAlarmObserver;
     private final BugreportObserver mBugreportObserver;
     private final BrightnessObserver mBrightnessObserver;
+	
+	private QuickSettingsTileView mTorchTile;
+	private RefreshCallback mTorchCallback;
+	private State mTorchState = new State();
+	
+	private QuickSettingsTileView mWifiApTile;
+	private RefreshCallback mWifiApCallback;
+	private State mWifiApState = new State();
+	
+	private QuickSettingsTileView mRingerTile;
+	private RefreshCallback mRingerCallback;
+	private State mRingerState = new State();
+	
+	private QuickSettingsTileView mVolumeTile;
+	private RefreshCallback mVolumeCallback;
+	private State mVolumeState = new State();
+	
+	private QuickSettingsTileView mScreenTile;
+	private RefreshCallback mScreenCallback;
+	private State mScreenState = new State();
 
     private QuickSettingsTileView mUserTile;
     private RefreshCallback mUserCallback;
@@ -230,6 +253,22 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     private QuickSettingsTileView mSettingsTile;
     private RefreshCallback mSettingsCallback;
     private State mSettingsState = new State();
+	
+	private String SETTINGS = "QS_Settings";
+	private String BRIGHTNESS = "QS_Brightness";
+	private String VOLUME = "QS_Volume";
+	private String BATTERY = "QS_Battery";
+	private String ROTATION = "QS_Rotation";
+	private String AIRPLANE = "QS_Airplane";
+	private String WIFI = "QS_Wifi";
+	private String DATA = "QS_Data";
+	private String BT = "QS_BT";
+	private String SCREEN = "QS_Screen";
+	private String LOCATION = "QS_Location";
+	private String RINGER = "QS_Ringer";
+	private String WIFIAP = "QS_WifiAp";
+	private String TORCH = "QS_Torch";
+	private String INTENT_UPDATE_TORCH_TILE = "QuickSettingsMod.UPDATE_TORCH_TILE";
 
     public QuickSettingsModel(Context context) {
         mContext = context;
@@ -252,6 +291,13 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         IntentFilter alarmIntentFilter = new IntentFilter();
         alarmIntentFilter.addAction(Intent.ACTION_ALARM_CHANGED);
         context.registerReceiver(mAlarmIntentReceiver, alarmIntentFilter);
+		
+		IntentFilter tileFilter = new IntentFilter();
+		tileFilter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION);
+		tileFilter.addAction(AudioManager.RINGER_MODE_CHANGED_ACTION);	
+		tileFilter.addAction(WifiManager.WIFI_AP_STATE_CHANGED_ACTION);
+		tileFilter.addAction(INTENT_UPDATE_TORCH_TILE);
+        context.registerReceiver(tileReceiver, tileFilter);
     }
 
     void updateResources() {
@@ -261,6 +307,41 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         refreshBrightnessTile();
         refreshRotationLockTile();
     }
+	
+	// Torch
+	void addTorchTile(QuickSettingsTileView view, RefreshCallback cb) {
+		mTorchTile = view;
+        mTorchCallback = cb;
+        mTorchCallback.refreshView(mTorchTile, mTorchState);
+    }
+	
+	// Wifi Ap
+	void addWifiApTile(QuickSettingsTileView view, RefreshCallback cb) {
+        mWifiApTile = view;
+        mWifiApCallback = cb;
+		mWifiApCallback.refreshView(mWifiApTile, mWifiApState);
+    }
+	
+	// Ringer
+	void addRingerTile(QuickSettingsTileView view, RefreshCallback cb) {
+        mRingerTile = view;
+        mRingerCallback = cb;
+		mRingerCallback.refreshView(mRingerTile, mRingerState);
+    }
+	
+	// Volume
+	void addVolumeTile(QuickSettingsTileView view, RefreshCallback cb) {
+        mVolumeTile = view;
+        mVolumeCallback = cb;
+		mVolumeCallback.refreshView(mVolumeTile, mVolumeState);
+    }
+	
+	// Screen
+	void addScreenTile(QuickSettingsTileView view, RefreshCallback cb) {
+        mScreenTile = view;
+        mScreenCallback = cb;
+		mScreenCallback.refreshView(mScreenTile, mScreenState);
+    }
 
     // Settings
     void addSettingsTile(QuickSettingsTileView view, RefreshCallback cb) {
@@ -268,10 +349,12 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         mSettingsCallback = cb;
         refreshSettingsTile();
     }
-    void refreshSettingsTile() {
-        Resources r = mContext.getResources();
-        mSettingsState.label = r.getString(R.string.quick_settings_settings_label);
-        mSettingsCallback.refreshView(mSettingsTile, mSettingsState);
+    void refreshSettingsTile() {		
+		Resources r = mContext.getResources();
+		mSettingsState.label = r.getString(R.string.quick_settings_settings_label);
+		if (isToggleEnabled(SETTINGS)) {
+			mSettingsCallback.refreshView(mSettingsTile, mSettingsState);
+		}
     }
 
     // User
@@ -283,7 +366,7 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     void setUserTileInfo(String name, Drawable avatar) {
         mUserState.label = name;
         mUserState.avatar = avatar;
-        mUserCallback.refreshView(mUserTile, mUserState);
+		mUserCallback.refreshView(mUserTile, mUserState);
     }
 
     // Time
@@ -349,7 +432,9 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
                 R.drawable.ic_qs_airplane_on :
                 R.drawable.ic_qs_airplane_off);
         mAirplaneModeState.label = r.getString(R.string.quick_settings_airplane_mode_label);
-        mAirplaneModeCallback.refreshView(mAirplaneModeTile, mAirplaneModeState);
+		if (isToggleEnabled(AIRPLANE)) {
+			mAirplaneModeCallback.refreshView(mAirplaneModeTile, mAirplaneModeState);
+		}
     }
 
     // Wifi
@@ -400,7 +485,9 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
             mWifiState.label = r.getString(R.string.quick_settings_wifi_off_label);
             mWifiState.signalContentDescription = r.getString(R.string.accessibility_wifi_off);
         }
-        mWifiCallback.refreshView(mWifiTile, mWifiState);
+		if (isToggleEnabled(WIFI)) {
+			mWifiCallback.refreshView(mWifiTile, mWifiState);
+		}
     }
 
     // RSSI
@@ -436,7 +523,9 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
             mRSSIState.label = enabled
                     ? removeTrailingPeriod(enabledDesc)
                     : r.getString(R.string.quick_settings_rssi_emergency_only);
-            mRSSICallback.refreshView(mRSSITile, mRSSIState);
+			if (isToggleEnabled(DATA)) {
+				mRSSICallback.refreshView(mRSSITile, mRSSIState);
+			}
         }
     }
 
@@ -479,7 +568,9 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
             mBluetoothState.label = r.getString(R.string.quick_settings_bluetooth_off_label);
             mBluetoothState.stateContentDescription = r.getString(R.string.accessibility_desc_off);
         }
-        mBluetoothCallback.refreshView(mBluetoothTile, mBluetoothState);
+		if (isToggleEnabled(BT)) {
+			mBluetoothCallback.refreshView(mBluetoothTile, mBluetoothState);
+		}
     }
     void refreshBluetoothTile() {
         if (mBluetoothTile != null) {
@@ -498,10 +589,14 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     public void onBatteryLevelChanged(int level, boolean pluggedIn) {
         mBatteryState.batteryLevel = level;
         mBatteryState.pluggedIn = pluggedIn;
-        mBatteryCallback.refreshView(mBatteryTile, mBatteryState);
+		if (isToggleEnabled(BATTERY)) {
+			mBatteryCallback.refreshView(mBatteryTile, mBatteryState);
+		}
     }
     void refreshBatteryTile() {
-        mBatteryCallback.refreshView(mBatteryTile, mBatteryState);
+		if (isToggleEnabled(BATTERY)) {
+			mBatteryCallback.refreshView(mBatteryTile, mBatteryState);
+		}
     }
 
     // Location
@@ -515,7 +610,7 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     public void onLocationGpsStateChanged(boolean inUse, String description) {
         mLocationState.enabled = inUse;
         mLocationState.label = description;
-        mLocationCallback.refreshView(mLocationTile, mLocationState);
+        //mLocationCallback.refreshView(mLocationTile, mLocationState);
     }
 
     // Bug report
@@ -685,7 +780,9 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
                 ? R.drawable.ic_qs_brightness_auto_on
                 : R.drawable.ic_qs_brightness_auto_off;
         mBrightnessState.label = r.getString(R.string.quick_settings_brightness_label);
-        mBrightnessCallback.refreshView(mBrightnessTile, mBrightnessState);
+		if (isToggleEnabled(BRIGHTNESS)) {
+			mBrightnessCallback.refreshView(mBrightnessTile, mBrightnessState);
+		}
     }
     void refreshBrightnessTile() {
         onBrightnessLevelChanged();
@@ -699,4 +796,31 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
         onNextAlarmChanged();
         onBugreportChanged();
     }
+	
+	private boolean isToggleEnabled(String toggle) {
+		return Settings.System.getInt(mContext.getContentResolver(), toggle , 1) == 1;	
+	}
+	
+	private final BroadcastReceiver tileReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+        	if (intent.getAction().equals(LocationManager.PROVIDERS_CHANGED_ACTION)) {
+				if (isToggleEnabled(LOCATION)) {
+					mLocationCallback.refreshView(mLocationTile, mLocationState);
+				}
+        	} else if (intent.getAction().equals(AudioManager.RINGER_MODE_CHANGED_ACTION)) {
+				if (isToggleEnabled(RINGER)) {
+					mRingerCallback.refreshView(mRingerTile, mRingerState);
+				}
+			} else if (intent.getAction().equals(WifiManager.WIFI_AP_STATE_CHANGED_ACTION)) {
+				if (isToggleEnabled(WIFIAP)) {
+					mWifiApCallback.refreshView(mWifiApTile, mWifiApState);
+				}
+			} else if (intent.getAction().equals(INTENT_UPDATE_TORCH_TILE)) {
+				if (isToggleEnabled(TORCH)) {
+					mTorchCallback.refreshView(mTorchTile, mTorchState);
+				}
+			}
+        }
+    };
 }
