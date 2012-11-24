@@ -2798,10 +2798,16 @@ public final class Settings {
         public static final String STATUS_BAR_IME_SWITCHER = "status_bar_ime_switcher";
 
          /**
-         * Navigation bar State
+         * Expanded desktop on/off state
          * @hide
          */
         public static final String EXPANDED_DESKTOP_STATE = "expanded_desktop_state";
+
+        /**
+         * Status bar State
+         * @hide
+         */
+        public static final String EXPANDED_DESKTOP_STATUS_BAR_STATE = "expanded_desktop_status_bar_state";
 
         /**
          * statusbar signal text color
@@ -2810,7 +2816,6 @@ public final class Settings {
          */
         public static final String STATUSBAR_SIGNAL_TEXT_COLOR = "statusbar_signal_text_color";
 
-        public static final String EXPANDED_DESKTOP_STATUS_BAR_STATE = "expanded_desktop_status_bar_state";
 
         /*
          * On or off the Pie.
@@ -2859,6 +2864,8 @@ public final class Settings {
          */
         public static final String PIE_GRAVITY = "pie_gravity";
 
+=======
+>>>>>>> 47523cc... Framework: Forward port Expanded desktop capability
         /**
          * Whether to use a separate delay for "slide to unlock" and security
          * lock
@@ -3160,6 +3167,12 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_MAXIMIZE_WIDGETS = "lockscreen_maximize_widgets";
+
+        /**
+         * Whether power menu expanded desktop is enabled
+         * @hide
+         */
+        public static final String POWER_MENU_EXPANDED_DESKTOP_ENABLED = "power_menu_expanded_desktop_enabled";
 
         /**
          * Whether to unlock the screen with the home key.  The value is boolean (1 or 0).
