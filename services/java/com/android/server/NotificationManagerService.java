@@ -141,7 +141,6 @@ public class NotificationManagerService extends INotificationManager.Stub
 
     private long[] mDefaultVibrationPattern;
     private long[] mFallbackVibrationPattern;
-
     private boolean mSystemReady;
     private int mDisabledNotifications;
 
@@ -713,7 +712,9 @@ public class NotificationManagerService extends INotificationManager.Stub
             mQuietHoursDim = Settings.System.getInt(resolver,
                     Settings.System.QUIET_HOURS_DIM, 0) != 0;
         }
-    static long[] getLongArray(Resources r, int resid, int maxlen, long[] def) {
+       }
+
+            static long[] getLongArray(Resources r, int resid, int maxlen, long[] def) {
         int[] ar = r.getIntArray(resid);
         if (ar == null) {
             return def;
@@ -724,6 +725,7 @@ public class NotificationManagerService extends INotificationManager.Stub
             out[i] = ar[i];
         }
         return out;
+
     }
 
     NotificationManagerService(Context context, StatusBarManagerService statusBar,
@@ -769,7 +771,6 @@ public class NotificationManagerService extends INotificationManager.Stub
                 com.android.internal.R.array.config_notificationFallbackVibePattern,
                 VIBRATE_PATTERN_MAXLEN,
                 DEFAULT_VIBRATE_PATTERN);
-
         // Don't start allowing notifications until the setup wizard has run once.
         // After that, including subsequent boots, init with notifications turned on.
         // This works on the first boot because the setup wizard will toggle this
@@ -1252,7 +1253,6 @@ public class NotificationManagerService extends INotificationManager.Stub
                 // vibrate
                 // Does the notification want to specify its own vibration?
                 final boolean hasCustomVibrate = notification.vibrate != null;
-
                 // new in 4.2: if there was supposed to be a sound and we're in vibrate mode,
                 // and no other vibration is specified, we apply the default vibration anyway
                 final boolean convertSoundToVibration =
@@ -1262,13 +1262,10 @@ public class NotificationManagerService extends INotificationManager.Stub
 
                 // The DEFAULT_VIBRATE flag trumps any custom vibration.
                 final boolean useDefaultVibrate =
-                    (notification.defaults & Notification.DEFAULT_VIBRATE) != 0
-                    || convertSoundToVibration;
-                if (!(inQuietHours && mQuietHoursStill)
-                        && (useDefaultVibrate || notification.vibrate != null)
                         (notification.defaults & Notification.DEFAULT_VIBRATE) != 0;
 
-                if ((useDefaultVibrate || convertSoundToVibration || hasCustomVibrate)
+                if (!(inQuietHours && mQuietHoursStill)
+                        && (useDefaultVibrate || convertSoundToVibration || hasCustomVibrate)
                         && !(audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT)) {
                     mVibrateNotification = r;
 
