@@ -50,8 +50,10 @@ import com.android.systemui.statusbar.policy.CurrentUserTracker;
 import com.android.systemui.statusbar.policy.LocationController.LocationGpsStateChangeCallback;
 import com.android.systemui.statusbar.policy.NetworkController.NetworkSignalChangedCallback;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
+import java.util.Collections;
 
 class QuickSettingsModel implements BluetoothStateChangeCallback,
         NetworkSignalChangedCallback,
@@ -798,7 +800,50 @@ class QuickSettingsModel implements BluetoothStateChangeCallback,
     }
 	
 	private boolean isToggleEnabled(String toggle) {
-		return Settings.System.getInt(mContext.getContentResolver(), toggle , 1) == 1;	
+	
+		ArrayList<String> mGesturesOrderedList = getGesturesOrderedList();
+		
+		boolean enabled = false;
+		for (int i = 0; i < mGesturesOrderedList.size(); i++) {
+			if (mGesturesOrderedList.get(i).equals(toggle)) {
+				enabled = true;
+			}
+		}
+		
+		return enabled;
+	}
+	
+	private ArrayList<String> getGesturesOrderedList() {
+		List<String> mGesturesList = Arrays.asList(SETTINGS, BRIGHTNESS, VOLUME, BATTERY, ROTATION, AIRPLANE, WIFI, DATA, BT, SCREEN, RINGER, 
+				LOCATION, WIFIAP, TORCH);
+				
+		boolean init = Settings.System.getInt(mContext.getContentResolver(), "QuickSettingsInit", 1) == 1;
+		if (init) {
+			for (int a = 0; a < mGesturesList.size(); a++) {   	
+				Settings.System.putInt(mContext.getContentResolver(), mGesturesList.get(a), a);
+			}  
+			Settings.System.putInt(mContext.getContentResolver(), "QuickSettingsInit", 0);
+		}
+		
+		ArrayList<Integer> posList = new ArrayList<Integer>();
+    	for (int i = 0; i < mGesturesList.size(); i++) {   	
+    		int value = Settings.System.getInt(mContext.getContentResolver(), mGesturesList.get(i), -1);
+    		posList.add(value);
+    	}   	
+    	Collections.sort(posList);
+    	
+		ArrayList<String> mGesturesOrderedList = new ArrayList<String>();
+    	for (int x = 0; x < posList.size(); x++) {
+    		if (posList.get(x) != -1) {
+    			for (int y = 0; y < mGesturesList.size(); y++) {
+    				if (Settings.System.getInt(mContext.getContentResolver(), mGesturesList.get(y), -1) == posList.get(x)) {
+    					mGesturesOrderedList.add(mGesturesList.get(y));
+    				}
+    			}
+    		}
+    	}
+		
+		return mGesturesOrderedList;
 	}
 	
 	private final BroadcastReceiver tileReceiver = new BroadcastReceiver() {
