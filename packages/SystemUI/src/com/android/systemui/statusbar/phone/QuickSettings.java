@@ -75,6 +75,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -655,7 +656,7 @@ class QuickSettings {
                 quick.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        startSettingsActivity(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
+                        startSettingsActivity(android.provider.Settings.ACTION_DATA_ROAMING_SETTINGS);
                         return true;
                     }
                 });
@@ -1150,42 +1151,6 @@ class QuickSettings {
                             tv.setText(state.label);
                             tv.setTextSize(1, mTileTextSize);
                         }
-                    }
-                });
-                break;
-            case SWAGGER_TILE:
-                quick = (QuickSettingsTileView)
-                        inflater.inflate(R.layout.quick_settings_tile, parent, false);
-                quick.setContent(R.layout.quick_settings_tile_swagger, inflater);
-                TextView tv = (TextView) quick.findViewById(R.id.swagger_textview);
-                tv.setTextSize(1, mTileTextSize);
-                quick.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        switch (event.getAction()) {
-                            case MotionEvent.ACTION_DOWN:
-                                if (tacoToggle) {
-                                    TextView tv = (TextView) v.findViewById(R.id.swagger_textview);
-                                    tv.setText(R.string.quick_settings_swagger);
-                                    tv.setTextSize(1, mTileTextSize);
-                                    tv.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_qs_swagger, 0, 0);
-                                    tacoSwagger = event.getEventTime();
-                                    tacoToggle = false;
-                                } else {
-                                    tacoSwagger = event.getEventTime();
-                                }
-                                break;
-                            case MotionEvent.ACTION_UP:
-                                if ((event.getEventTime() - tacoSwagger) > 2500) {
-                                    TextView tv = (TextView) v.findViewById(R.id.swagger_textview);
-                                    tv.setText(R.string.quick_settings_fbgt);
-                                    tv.setTextSize(1, mTileTextSize);
-                                    tv.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_qs_fbgt_on, 0, 0);
-                                    tacoToggle = true;
-                                }
-                                break;
-                        }
-                        return true;
                     }
                 });
                 break;

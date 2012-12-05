@@ -49,14 +49,14 @@ interface ITelephony {
      * @param boolean to turn on and off LTE
      * @hide
      */
-     void toggleLTE(boolean on);
+    void toggleLTE(boolean on);
 
      /**
       * Toggle between 2G and 3G (NT_MODE_GSM, NT_MODE_WCDMA_PREF)
       * @param boolean to turn on and off 2G
       * @hide
       */
-      void toggle2G(boolean on);
+    void toggle2G(boolean on);
 
     /**
      * If there is currently a call in progress, show the call screen.
