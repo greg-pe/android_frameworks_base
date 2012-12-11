@@ -3302,7 +3302,7 @@ public final class Settings {
          *  we always vibrate, even if no vibration was specified
          */
         public static final String NOTIFICATION_CONVERT_SOUND_TO_VIBRATION = "convert_sound_to_vibration";
-         * @hide
+         /** @hide
          */
         public static final String NAVIGATION_BAR_SHOW = "navigation_bar_show" ;
 

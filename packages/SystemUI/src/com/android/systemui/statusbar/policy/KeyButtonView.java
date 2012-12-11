@@ -26,13 +26,11 @@ import android.graphics.drawable.Drawable;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.hardware.input.InputManager;
-<<<<<<< HEAD
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.os.ServiceManager;
 import android.util.AttributeSet;
 import android.view.accessibility.AccessibilityEvent;
-=======
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.hardware.input.InputManager;
