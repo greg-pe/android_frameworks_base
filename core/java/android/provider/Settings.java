@@ -2650,6 +2650,13 @@ public final class Settings {
         public static final String EXPANDED_HIDE_ONCHANGE = "expanded_hide_onchange";
 
         /**
+         * Quick Settings Quick Pulldown
+         *
+         * @hide
+         */
+        public static final String QS_QUICK_PULLDOWN = "qs_quick_pulldown";
+
+        /**
          * Hide scroll bar in power widget
          *
          * @hide
