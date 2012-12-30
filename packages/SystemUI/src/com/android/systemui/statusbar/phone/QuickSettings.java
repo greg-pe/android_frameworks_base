@@ -1575,8 +1575,8 @@ class QuickSettings {
     };
 
     private void setFastCharge(final boolean on) {
-        Intent fastChargeIntent = new Intent("com.aokp.romcontrol.ACTION_CHANGE_FCHARGE_STATE");
-        fastChargeIntent.setPackage("com.aokp.romcontrol");
+        Intent fastChargeIntent = new Intent("com.android.settings.ACTION_CHANGE_FCHARGE_STATE");
+        fastChargeIntent.setPackage("com.android.settings");
         fastChargeIntent.putExtra("newState", on);
         mContext.sendBroadcast(fastChargeIntent);
         mHandler.postDelayed(new Runnable() {
