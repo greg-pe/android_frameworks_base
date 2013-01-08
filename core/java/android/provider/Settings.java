@@ -2941,6 +2941,13 @@ public final class Settings {
          * @hide
          */
         public static final String POWER_MENU_SILENT_ENABLED = "power_menu_silent_enabled";
+
+        /**
+	* Wether the hints for the left and right widgets are shown when the screen is turned on
+	* @hide
+	*/
+        public static final String LOCKSCREEN_HIDE_INITIAL_PAGE_HINTS = "lockscreen_hide_initial_page_hints";
+
         /**
          * enabled and order of quick toggles
          * 
