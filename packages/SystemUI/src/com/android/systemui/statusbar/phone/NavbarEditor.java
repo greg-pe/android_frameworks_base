@@ -359,22 +359,33 @@ public class NavbarEditor implements OnTouchListener {
      * number of keys in use.
      */
     private void adjustPadding() {
+        adjustOuterPadding((ViewGroup) mParent.findViewById(R.id.nav_buttons));
         ViewGroup viewParent = (ViewGroup) mParent.findViewById(R.id.mid_nav_buttons);
         int sCount = visibleCount;
         for (int v = 0; v < viewParent.getChildCount();v++) {
             View cView = viewParent.getChildAt(v);
-            if (NavigationBarView.getEditMode()) {
-                cView.setVisibility(View.VISIBLE);
-            } else if (cView instanceof KeyButtonView) {
+            if (cView instanceof KeyButtonView) {
                 View nextPadding = viewParent.getChildAt(v+1);
-                String curTag = (String) cView.getTag();
-                if (curTag == null || curTag.equals(NAVBAR_EMPTY)) {
-                    cView.setVisibility(View.GONE);
-                    if (nextPadding != null) {
-                        nextPadding.setVisibility(View.GONE);
+                if (nextPadding != null) {
+                    View nextKey = viewParent.getChildAt(v+2);
+                    String nextTag = NAVBAR_EMPTY;
+                    if (nextKey != null) {
+                        nextTag = (String) nextKey.getTag();
+                    }
+                    String curTag = (String) cView.getTag();
+                    if (nextKey != null && nextTag != null && curTag != null && !curTag.equals(NAVBAR_EMPTY)) {
+                        if (!nextTag.equals(NAVBAR_EMPTY)){
+                            nextPadding.setVisibility(View.VISIBLE);
+                        } else {
+                            if (sCount > 1) {
+                                nextPadding.setVisibility(View.VISIBLE);
+                            } else {
+                                nextPadding.setVisibility(View.GONE);
+                            }
+                        }
+                        sCount--;
                     } else {
-                        View prevPadding = viewParent.getChildAt(v-1);
-                        prevPadding.setVisibility(View.GONE);
+                        nextPadding.setVisibility(View.GONE);
                     }
                 }
             }
@@ -383,6 +394,7 @@ public class NavbarEditor implements OnTouchListener {
 
     protected void updateLowLights(View current) {
         ViewGroup lowLights = (ViewGroup) current.findViewById(R.id.lights_out);
+        adjustOuterPadding((ViewGroup) lowLights.getParent());
         int totalViews = lowLights.getChildCount();
         int visibleCount = NavbarEditor.visibleCount;
         for (int v = 0;v<totalViews;v++) {
@@ -402,6 +414,20 @@ public class NavbarEditor implements OnTouchListener {
                         blank.setVisibility(View.GONE);
                     }
                 }
+            }
+        }
+    }
+
+    private void adjustOuterPadding(ViewGroup parent) {
+        boolean editMode = NavigationBarView.getEditMode();
+        boolean isLandscape = mContext.getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+        //Hide the extra padding on hybrid devices
+        for (int c = 0; c < parent.getChildCount(); c++) {
+            View v = parent.getChildAt(c);
+            if (v != null && !(v instanceof KeyButtonView) && !(v instanceof LinearLayout) && !(v instanceof ImageView)) {
+                boolean hidePadding = editMode || (visibleCount == 4 && !isLandscape);
+                v.setVisibility(hidePadding ? View.GONE : View.VISIBLE);
             }
         }
     }
