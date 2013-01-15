@@ -1217,7 +1217,7 @@ public class QuickSettings {
                         }
                         else {
                             tv.setCompoundDrawablesWithIntrinsicBounds(0, state.iconId, 0, 0);
-                        }
+                        }          
                         tv.setTextSize(1, mTileTextSize);
                     }
                 });
