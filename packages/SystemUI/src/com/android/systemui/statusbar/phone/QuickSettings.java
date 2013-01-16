@@ -1763,12 +1763,14 @@ public class QuickSettings {
                     false, this);
             mModel.refreshVibrateTile();
             mModel.refreshSilentTile();
+            mModel.refreshSoundStateTile();
         }
 
         @Override
         public void onChange(boolean selfChange) {
             mModel.refreshVibrateTile();
             mModel.refreshSilentTile();
+            mModel.refreshSoundStateTile();
         }
     }
 }
