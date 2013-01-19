@@ -824,9 +824,9 @@ class QuickSettings {
                 quick.setContent(R.layout.quick_settings_tile_torch, inflater);
                 quick.setOnClickListener(new View.OnClickListener() {
                     @Override
-		    public void onClick(View v) {
-			Intent i = new Intent("net.cactii.flash2.TOGGLE_FLASHLIGHT");
-                        mContext.sendBroadcast(i);	
+                    public void onClick(View v) {
+                        mAokpTarget.launchAction(mAokpTarget.ACTION_TORCH);
+                        mHandler.postDelayed(delayedRefresh, 1000);
                     }
                 });
                 quick.setOnLongClickListener(new View.OnLongClickListener() {
