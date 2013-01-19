@@ -2963,12 +2963,6 @@ public final class Settings {
         public static final String QUICK_TOGGLES_PER_ROW = "quick_toggles_per_row";
 
         /**
-         * Whether to control torch by holding power button with screen off
-         * @hide
-         */
-        public static final String POWER_BUTTON_TORCH = "power_button_torch";
-
-        /**
          * favorite contact for quick settings
          *
          * @hide
