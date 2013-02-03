@@ -2809,6 +2809,13 @@ public final class Settings {
          */
         public static final String EXPANDED_DESKTOP_STATUS_BAR_STATE = "expanded_desktop_status_bar_state";
 
+        /** 
+         * Expanded desktop style (with status bar or without status bar)
+         * @hide
+         */
+        public static final String EXPANDED_DESKTOP_STYLE = "expanded_desktop_style";
+
+
         /**
          * statusbar signal text color
          *
@@ -2864,9 +2871,6 @@ public final class Settings {
          */
         public static final String PIE_GRAVITY = "pie_gravity";
 
-=======
->>>>>>> 47523cc... Framework: Forward port Expanded desktop capability
-        /**
          * Whether to use a separate delay for "slide to unlock" and security
          * lock
          * Pie status report
