@@ -43,6 +43,7 @@
                 android:layout_marginTop="1dp"
                 />
 
+
             <!-- navigation controls -->
             <LinearLayout
                 android:id="@+id/navigationArea"
