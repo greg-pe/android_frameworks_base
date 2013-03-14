@@ -297,7 +297,7 @@ public class QuickSettings {
         new NetworkModeObserver(new Handler()).observe();
     }
 
-    void setBar(PanelBar bar) {
+    public void setBar(PanelBar bar) {
         mBar = bar;
     }
 
@@ -313,7 +313,7 @@ public class QuickSettings {
         mModel.onImeWindowStatusChanged(visible);
     }
 
-    void setup(NetworkController networkController, BluetoothController bluetoothController,
+    public void setup(NetworkController networkController, BluetoothController bluetoothController,
             BatteryController batteryController, LocationController locationController) {
         mBluetoothController = bluetoothController;
 
@@ -504,7 +504,7 @@ public class QuickSettings {
                                 (UserManager) mContext.getSystemService(Context.USER_SERVICE);
                         if (um.getUsers(true).size() > 1) {
                             try {
-                        WindowManagerGlobal.getWindowManagerService().lockNow(null);
+                                WindowManagerGlobal.getWindowManagerService().lockNow(null);
                             } catch (RemoteException e) {
                                 Log.e(TAG, "Couldn't show user switcher", e);
                             }
@@ -860,7 +860,6 @@ public class QuickSettings {
                     @Override
                     public void onClick(View v) {
                         mAokpTarget.launchAction(mAokpTarget.ACTION_TORCH);
-                        mHandler.postDelayed(delayedRefresh, 1000);
                     }
                 });
                 quick.setOnLongClickListener(new View.OnLongClickListener() {
@@ -1685,7 +1684,6 @@ public class QuickSettings {
         public void run() {
             mModel.refreshWifiTetherTile();
             mModel.refreshUSBTetherTile();
-            mModel.refreshTorchTile();
         }
     };
 
