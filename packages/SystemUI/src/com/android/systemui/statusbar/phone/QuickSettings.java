@@ -130,6 +130,7 @@ public class QuickSettings {
     private static final int LTE_TILE = 22;
     private static final int FAV_CONTACT_TILE = 23;
    // private static final int BT_TETHER_TILE = 23;
+    private static final int SOUND_STATE_TILE = 24;
 
     public static final String USER_TOGGLE = "USER";
     public static final String BRIGHTNESS_TOGGLE = "BRIGHTNESS";
@@ -156,6 +157,7 @@ public class QuickSettings {
     public static final String TWOG_TOGGLE = "2G";
     public static final String LTE_TOGGLE = "LTE";
     public static final String FAV_CONTACT_TOGGLE = "FAVCONTACT";
+    public static final String SOUND_STATE_TOGGLE = "SOUNDSTATE";
 
     private static final String DEFAULT_TOGGLES = "default";
 
@@ -236,6 +238,7 @@ public class QuickSettings {
             toggleMap.put(TWOG_TOGGLE, TWOG_TILE);
             toggleMap.put(LTE_TOGGLE, LTE_TILE);
             toggleMap.put(FAV_CONTACT_TOGGLE, FAV_CONTACT_TILE);
+            toggleMap.put(SOUND_STATE_TOGGLE, SOUND_STATE_TILE);
             //toggleMap.put(BT_TETHER_TOGGLE, BT_TETHER_TILE);
         }
         return toggleMap;
@@ -260,6 +263,7 @@ public class QuickSettings {
         connManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         mBluetoothState = new QuickSettingsModel.BluetoothState();
+
         mHandler = new Handler();
 
         mAokpTarget = new AokpTarget(mContext);
@@ -498,8 +502,7 @@ public class QuickSettings {
                                 (UserManager) mContext.getSystemService(Context.USER_SERVICE);
                         if (um.getUsers(true).size() > 1) {
                             try {
-                                WindowManagerGlobal.getWindowManagerService().lockNow(
-                                        LockPatternUtils.USER_SWITCH_LOCK_OPTIONS);
+                        WindowManagerGlobal.getWindowManagerService().lockNow(null);
                             } catch (RemoteException e) {
                                 Log.e(TAG, "Couldn't show user switcher", e);
                             }
@@ -819,6 +822,34 @@ public class QuickSettings {
                     }
                 });
                 break;
+            case SOUND_STATE_TILE:
+                quick = (QuickSettingsTileView)
+                        inflater.inflate(R.layout.quick_settings_tile, parent, false);
+                quick.setContent(R.layout.quick_settings_tile_sound_state, inflater);
+                quick.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mAokpTarget.launchAction(mAokpTarget.ACTION_SILENT_VIB);
+                        mModel.refreshSoundStateTile();
+                    }
+                });
+                quick.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        startSettingsActivity(android.provider.Settings.ACTION_SOUND_SETTINGS);
+                        return true;
+                    }
+                });
+                mModel.addSoundStateTile(quick, new QuickSettingsModel.RefreshCallback() {
+                    @Override
+                    public void refreshView(QuickSettingsTileView view, State state) {
+                        TextView tv = (TextView) view.findViewById(R.id.sound_state_textview);
+                        tv.setCompoundDrawablesWithIntrinsicBounds(0, state.iconId, 0, 0);
+                        tv.setText(state.label);
+                        tv.setTextSize(1, mTileTextSize);
+                    }
+                });
+                break;
             case TORCH_TILE:
                 quick = (QuickSettingsTileView)
                         inflater.inflate(R.layout.quick_settings_tile, parent, false);
@@ -982,14 +1013,17 @@ public class QuickSettings {
                     public void onClick(View v) {
                         boolean enabled = false;
                         if (mNfcAdapter == null) {
-                            mNfcAdapter = NfcAdapter.getDefaultAdapter();
-                            mModel.setNfcAdapter(mNfcAdapter);
+                            mNfcAdapter = NfcAdapter.getDefaultAdapter(mContext);
                         }
-                        enabled = mNfcAdapter.isEnabled();
-                        if (enabled) {
-                            mNfcAdapter.disable();
-                        } else {
-                            mNfcAdapter.enable();
+                        try {
+                            enabled = mNfcAdapter.isEnabled();
+                            if (enabled) {
+                                mNfcAdapter.disable();
+                            } else {
+                                mNfcAdapter.enable();
+                            }
+                        } catch (NullPointerException ex) {
+                            // we'll ignore this click
                         }
                     }
                 });
@@ -1174,15 +1208,15 @@ public class QuickSettings {
                         boolean gpsEnabled = Settings.Secure.isLocationProviderEnabled(
                                 mContext.getContentResolver(), LocationManager.GPS_PROVIDER);
                         TextView tv = (TextView) view.findViewById(R.id.location_textview);
-                        String newString = state.label;
-                        if ((newString == null) || (newString.equals(""))) {
-                            tv.setText(gpsEnabled ? R.string.quick_settings_gps_on_label
-                                    : R.string.quick_settings_gps_off_label);
+                        tv.setText(gpsEnabled
+                                ? R.string.quick_settings_gps_on_label
+                                : R.string.quick_settings_gps_off_label);
+                        if (state.iconId == 0) {
                             tv.setCompoundDrawablesWithIntrinsicBounds(0, gpsEnabled ?
                                     R.drawable.ic_qs_gps_on : R.drawable.ic_qs_gps_off, 0, 0);
-                        } else {
-                            tv.setText(state.label);
-                            tv.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_qs_gps_locked, 0, 0);
+                        }
+                        else {
+                            tv.setCompoundDrawablesWithIntrinsicBounds(0, state.iconId, 0, 0);
                         }
                         tv.setTextSize(1, mTileTextSize);
                     }

@@ -21,6 +21,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.os.BatteryManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.UserHandle;
@@ -55,7 +56,7 @@ class KeyguardMessageArea extends TextView {
     boolean mShowingBouncer = false;
 
     // last known plugged in state
-    boolean mPluggedIn = false;
+    boolean mPluggedIn = false; 
 
     // last known battery level
     int mBatteryLevel = 100;
@@ -230,9 +231,9 @@ class KeyguardMessageArea extends TextView {
             // Battery status
             if (mPluggedIn) {
                 // Charging, charged or waiting to charge.
-                string = getContext().getString(mBatteryCharged ?
-                        com.android.internal.R.string.lockscreen_charged
-                        :com.android.internal.R.string.lockscreen_plugged_in, mBatteryLevel);
+                string = getContext().getString(mBatteryCharged
+                        ? com.android.internal.R.string.lockscreen_charged
+                        : com.android.internal.R.string.lockscreen_plugged_in, mBatteryLevel);
                 icon.value = CHARGING_ICON;
             } else if (mBatteryIsLow) {
                 // Battery is low

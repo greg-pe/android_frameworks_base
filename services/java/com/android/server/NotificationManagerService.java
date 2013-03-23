@@ -769,6 +769,7 @@ public class NotificationManagerService extends INotificationManager.Stub
                 com.android.internal.R.array.config_notificationFallbackVibePattern,
                 VIBRATE_PATTERN_MAXLEN,
                 DEFAULT_VIBRATE_PATTERN);
+
         // Don't start allowing notifications until the setup wizard has run once.
         // After that, including subsequent boots, init with notifications turned on.
         // This works on the first boot because the setup wizard will toggle this
@@ -1214,6 +1215,7 @@ public class NotificationManagerService extends INotificationManager.Stub
 
                 final AudioManager audioManager = (AudioManager) mContext
                 .getSystemService(Context.AUDIO_SERVICE);
+
                 // sound
                 final boolean useDefaultSound =
                     (notification.defaults & Notification.DEFAULT_SOUND) != 0;
@@ -1255,16 +1257,16 @@ public class NotificationManagerService extends INotificationManager.Stub
                 final boolean hasCustomVibrate = notification.vibrate != null;
 
                 // new in 4.2: if there was supposed to be a sound and we're in vibrate mode,
-                // and no other vibration is specified, we apply the default vibration anyway
+                // and no other vibration is specified, we fall back to vibration
                 final boolean convertSoundToVibration =
                            !hasCustomVibrate
                         && (useDefaultSound || notification.sound != null)
                         && (audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE)
                         && (Settings.System.getBoolean(mContext.getContentResolver(), Settings.System.NOTIFICATION_CONVERT_SOUND_TO_VIBRATION, false));
 
-                // The DEFAULT_VIBRATE flag trumps any custom vibration.
+                // The DEFAULT_VIBRATE flag trumps any custom vibration AND the fallback.
                 final boolean useDefaultVibrate =
-                        (notification.defaults & Notification.DEFAULT_VIBRATE) != 0;
+                    (notification.defaults & Notification.DEFAULT_VIBRATE) != 0;
                 if (!(inQuietHours && mQuietHoursStill)
                         && (useDefaultVibrate || convertSoundToVibration || hasCustomVibrate)
                         && !(audioManager.getRingerMode() == AudioManager.RINGER_MODE_SILENT)) {
