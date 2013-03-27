@@ -2847,7 +2847,7 @@ public final class Settings {
          * Status bar State
          * @hide
          */
-        public static final String EXPANDED_DESKTOP_STATUS_BAR_STATE = "expanded_desktop_status_bar_state"
+        public static final String EXPANDED_DESKTOP_STATUS_BAR_STATE = "expanded_desktop_status_bar_state";
          
          /** 
          * Expanded desktop style (with status bar or without status bar)
