@@ -4629,62 +4629,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
     }
 
-    void updateDisplayMetrics() {
-        try {
-            mWindowManager.updateDisplayMetrics();
-        } catch (RemoteException e) {
-            // Ignore
-        }
-    }
-
-    /**
-     * Return an Intent to launch the currently active dock app as home.  Returns
-     * null if the standard home should be launched, which is the case if any of the following is
-     * true:
-     * <ul>
-     *  <li>The device is not in either car mode or desk mode
-     *  <li>The device is in car mode but ENABLE_CAR_DOCK_HOME_CAPTURE is false
-     *  <li>The device is in desk mode but ENABLE_DESK_DOCK_HOME_CAPTURE is false
-     *  <li>The device is in car mode but there's no CAR_DOCK app with METADATA_DOCK_HOME
-     *  <li>The device is in desk mode but there's no DESK_DOCK app with METADATA_DOCK_HOME
-     * </ul>
-     * @return
-     */
-    Intent createHomeDockIntent() {
-        Intent intent = null;
-
-        // What home does is based on the mode, not the dock state.  That
-        // is, when in car mode you should be taken to car home regardless
-        // of whether we are actually in a car dock.
-        if (mUiMode == Configuration.UI_MODE_TYPE_CAR) {
-            if (ENABLE_CAR_DOCK_HOME_CAPTURE) {
-                intent = mCarDockIntent;
-            }
-        } else if (mUiMode == Configuration.UI_MODE_TYPE_DESK) {
-            if (ENABLE_DESK_DOCK_HOME_CAPTURE) {
-                intent = mDeskDockIntent;
-            }
-        }
-
-        if (intent == null) {
-            return null;
-        }
-
-        ActivityInfo ai = intent.resolveActivityInfo(
-                mContext.getPackageManager(), PackageManager.GET_META_DATA);
-        if (ai == null) {
-            return null;
-        }
-
-        if (ai.metaData != null && ai.metaData.getBoolean(Intent.METADATA_DOCK_HOME)) {
-            intent = new Intent(intent);
-            intent.setClassName(ai.packageName, ai.name);
-            return intent;
-        }
-
-        return null;
-    }
-
     void startDockOrHome() {
         // We don't have dock home anymore. Home is home. If you lived here, you'd be home by now.
         mContext.startActivityAsUser(mHomeIntent, UserHandle.CURRENT);
