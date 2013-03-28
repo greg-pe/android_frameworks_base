@@ -1728,7 +1728,6 @@ public class QuickSettings {
         updateWifiDisplayStatus();
         updateResources();
         reloadFavContactInfo();
-        mModel.refreshNavBarHideTile();
         mModel.refreshTorchTile();
     }
 
