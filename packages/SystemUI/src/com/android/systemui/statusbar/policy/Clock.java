@@ -59,7 +59,6 @@ public class Clock extends TextView {
     protected SimpleDateFormat mClockFormat;
     private Locale mLocale;
 
-
     public static final int AM_PM_STYLE_NORMAL  = 0;
     public static final int AM_PM_STYLE_SMALL   = 1;
     public static final int AM_PM_STYLE_GONE    = 2;
@@ -104,6 +103,11 @@ public class Clock extends TextView {
 
     public Clock(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        mHandler = new Handler();
+        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
+        settingsObserver.observe();
+        updateSettings();
     }
 
     @Override
@@ -164,12 +168,12 @@ public class Clock extends TextView {
         }
     };
 
-    final void updateClock() {
+    protected final void updateClock() {
         mCalendar.setTimeInMillis(System.currentTimeMillis());
         setText(getSmallTime());
     }
 
-    private final CharSequence getSmallTime() {
+    protected final CharSequence getSmallTime() {
         Context context = getContext();
         boolean b24 = DateFormat.is24HourFormat(context);
         int res;
@@ -245,10 +249,6 @@ public class Clock extends TextView {
  
         return result;
 
-    }
-
-    private void updateParameters() {
-        mClockFormatString = null;
     }
 
     protected void updateSettings(){

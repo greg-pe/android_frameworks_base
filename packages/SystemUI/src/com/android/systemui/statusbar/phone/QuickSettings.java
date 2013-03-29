@@ -99,7 +99,7 @@ import java.util.HashMap;
 /**
  *
  */
-public class QuickSettings {
+class QuickSettings {
     private static final String TAG = "QuickSettings";
     public static final boolean SHOW_IME_TILE = false;
 
