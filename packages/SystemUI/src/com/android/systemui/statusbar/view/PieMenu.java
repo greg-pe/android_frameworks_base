@@ -101,7 +101,6 @@ public class PieMenu extends FrameLayout {
     // Special purpose
     private static int ANIMATOR_BATTERY_METER = 21;
     private static int ANIMATOR_SNAP_WOBBLE = 22;
-    private static int ANIMATOR_SNAP_GROW = 23;
 
     private static final int COLOR_ALPHA_MASK = 0xaa000000;
     private static final int COLOR_OPAQUE_MASK = 0xff000000;
@@ -212,9 +211,8 @@ public class PieMenu extends FrameLayout {
         public boolean active;
     }
 
-    private SnapPoint[] mSnapPoint = new SnapPoint[3];
+    private SnapPoint[] mSnapPoint = new SnapPoint[4];
     int mSnapRadius;
-    int mSnapThickness;
 
     // Flags
     private int mStatusMode;
@@ -223,7 +221,6 @@ public class PieMenu extends FrameLayout {
     private boolean mEnableColor;
     private boolean mUseMenuAlways;
     private boolean mUseSearch;
-    private boolean mHapticFeedback;
 
     // Animations
     private int mGlowOffsetLeft = 150;
@@ -284,22 +281,13 @@ public class PieMenu extends FrameLayout {
                 Settings.System.PIE_SIZE, 1f);
         mPieGap = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.PIE_GAP, 1);
-        mHapticFeedback = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0;
 
         // Snap
         mSnapRadius = (int)(mResources.getDimensionPixelSize(R.dimen.pie_snap_radius) * mPieSize);
-        mSnapThickness = (int)(mResources.getDimensionPixelSize(R.dimen.pie_snap_thickness) * mPieSize);
-
-        int snapIndex = 0;
-        if (mPanelOrientation != Gravity.LEFT)
-            mSnapPoint[snapIndex++] = new SnapPoint(0 + mSnapThickness / 2,getHeight()/2, mSnapRadius, 0x22, Gravity.LEFT);
-        if (mPanelOrientation != Gravity.TOP)
-            mSnapPoint[snapIndex++] = new SnapPoint(getWidth()/2,0 + mSnapThickness / 2, mSnapRadius, 0x22, Gravity.TOP);
-        if (mPanelOrientation != Gravity.RIGHT)
-            mSnapPoint[snapIndex++] = new SnapPoint(getWidth() - mSnapThickness / 2,getHeight()/2, mSnapRadius, 0x22, Gravity.RIGHT);
-        if (mPanelOrientation != Gravity.BOTTOM)
-            mSnapPoint[snapIndex++] = new SnapPoint(getWidth()/2, getHeight() - mSnapThickness / 2, mSnapRadius, 0x22, Gravity.BOTTOM);
+        mSnapPoint[0] = new SnapPoint(0,getHeight()/2, mSnapRadius, 0x22, Gravity.LEFT);
+        mSnapPoint[1] = new SnapPoint(getWidth()/2,0, mSnapRadius, 0x22, Gravity.TOP);
+        mSnapPoint[2] = new SnapPoint(getWidth(),getHeight()/2, mSnapRadius, 0x22, Gravity.RIGHT);
+        mSnapPoint[3] = new SnapPoint(getWidth()/2,getHeight(), mSnapRadius, 0x22, Gravity.BOTTOM);
 
         // Create Pie
         mEmptyAngle = (int)(EMPTY_ANGLE_BASE * mPieSize);
@@ -450,28 +438,6 @@ public class PieMenu extends FrameLayout {
         mAnimators[ANIMATOR_SNAP_WOBBLE].animator.setInterpolator(new DecelerateInterpolator());
         mAnimators[ANIMATOR_SNAP_WOBBLE].animator.setRepeatMode(ValueAnimator.REVERSE);
         mAnimators[ANIMATOR_SNAP_WOBBLE].animator.setRepeatCount(ValueAnimator.INFINITE);
-
-        mAnimators[ANIMATOR_SNAP_GROW].manual = true;
-        mAnimators[ANIMATOR_SNAP_GROW].animator.setDuration(1000);
-        mAnimators[ANIMATOR_SNAP_GROW].animator.setInterpolator(new AccelerateInterpolator());
-        mAnimators[ANIMATOR_SNAP_GROW].animator.addListener(new Animator.AnimatorListener() {
-            @Override public void onAnimationCancel(Animator animation) {}
-            @Override public void onAnimationRepeat(Animator animation) {}
-            @Override public void onAnimationStart(Animator animation) {}
-            @Override public void onAnimationEnd(Animator animation) {
-                android.util.Log.d("PARANOID", "hhh");
-                if (mAnimators[ANIMATOR_SNAP_GROW].fraction == 1) {
-                    for (int i = 0; i < 3; i++) {
-                        SnapPoint snap = mSnapPoint[i];
-                        if (snap.active) {
-                            if(mHapticFeedback) mVibrator.vibrate(2);
-                            deselect();
-                            animateOut();
-                            mPanel.reorient(snap.gravity);
-                        }
-                    }
-                }
-            }});
     }
 
     private int extractRGB(int color) {
@@ -760,23 +726,16 @@ public class PieMenu extends FrameLayout {
 
             // Snap points
             if (mCenterDistance > mOuterChevronRadius) {
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < 4; i++) {
                     SnapPoint snap = mSnapPoint[i];
-                    mSnapBackground.setAlpha((int)(snap.alpha + (snap.active ? mAnimators[ANIMATOR_SNAP_GROW].fraction * 80 : 0)));
+                    mSnapBackground.setAlpha(snap.alpha);
 
                     int wobble = 0;
                     if (snap.active) {
                         wobble = (int)(mAnimators[ANIMATOR_SNAP_WOBBLE].fraction * mSnapRadius / 2);
                         wobble = mSnapRadius + wobble;
                     }
-                    canvas.drawCircle (snap.x, snap.y, snap.radius + wobble + (snap.active ? mAnimators[ANIMATOR_SNAP_GROW].fraction *
-                            Math.max(getWidth(), getHeight()) : 0), mSnapBackground);
-
-                    mSnapBackground.setAlpha((int)(snap.alpha * 2.15f  + (snap.active ? mAnimators[ANIMATOR_SNAP_GROW].fraction * 80 : 0)));
-                    int len = (int)(snap.radius * 1.3f + (snap.active ? mAnimators[ANIMATOR_SNAP_GROW].fraction * 500 : 0));
-                    int thick = (int)(len * 0.2f);
-                    canvas.drawRect(snap.x - len / 2, snap.y - thick / 2, snap.x + len / 2, snap.y + thick / 2, mSnapBackground);
-                    canvas.drawRect(snap.x - thick / 2, snap.y - len / 2, snap.x + thick / 2, snap.y + len / 2, mSnapBackground);
+                    canvas.drawCircle (snap.x, snap.y, snap.radius + wobble, mSnapBackground);
                 }
             }
 
@@ -815,7 +774,7 @@ public class PieMenu extends FrameLayout {
                     mBatteryJuice.setAlpha((int)(mAnimators[ANIMATOR_ACC_SPEED15].fraction * 0x88));
 
                     state = canvas.save();
-                    canvas.rotate(90 + (1-mAnimators[ANIMATOR_ACC_INC_1].fraction) * 500, mCenter.x, mCenter.y);
+                    canvas.rotate(90 + (1-mAnimators[ANIMATOR_ACC_INC_1].fraction) * 1000, mCenter.x, mCenter.y);
                     canvas.drawPath(mBatteryPathBackground, mBatteryBackground);
                     canvas.restoreToCount(state);
 
@@ -918,32 +877,50 @@ public class PieMenu extends FrameLayout {
         float distanceX = mCenter.x-x;
         float distanceY = mCenter.y-y;
         mCenterDistance = (float)Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
+
         float shadeTreshold = mOuterChevronRadius; 
-        
+        final boolean hapticFeedback = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.HAPTIC_FEEDBACK_ENABLED, 1) != 0;
+
         int action = evt.getActionMasked();
         if (MotionEvent.ACTION_DOWN == action) {
             // Open panel
+            mPanel.show(true);
             animateIn();
         } else if (MotionEvent.ACTION_UP == action) {
             if (mOpen) {
                 PieItem item = mCurrentItem;
 
+                // Check for snap points first
+                for (int i = 0; i < 4; i++) {
+                    SnapPoint snap = mSnapPoint[i];
+                    if (snap.active) {
+                        if(hapticFeedback) mVibrator.vibrate(3);
+                        deselect();
+                        animateOut();
+                        mPanel.reorient(snap.gravity);
+                        return true;
+                    }
+                }
+
                 // Activate any panels?
                 mStatusPanel.hidePanels(true);
-                switch(mStatusPanel.getFlipViewState()) {
-                    case PieStatusPanel.NOTIFICATIONS_PANEL:
-                        mStatusPanel.setCurrentViewState(PieStatusPanel.NOTIFICATIONS_PANEL);
-                        mStatusPanel.showNotificationsPanel();
-                        break;
-                    case PieStatusPanel.QUICK_SETTINGS_PANEL:
-                        mStatusPanel.setCurrentViewState(PieStatusPanel.QUICK_SETTINGS_PANEL);
-                        mStatusPanel.showTilesPanel();
-                    break;
+                if (mStatusPanel.getFlipViewState() != -1) {
+                    switch(mStatusPanel.getFlipViewState()) {
+                        case PieStatusPanel.NOTIFICATIONS_PANEL:
+                            mStatusPanel.setCurrentViewState(PieStatusPanel.NOTIFICATIONS_PANEL);
+                            mStatusPanel.showNotificationsPanel();
+                            break;
+                        case PieStatusPanel.QUICK_SETTINGS_PANEL:
+                            mStatusPanel.setCurrentViewState(PieStatusPanel.QUICK_SETTINGS_PANEL);
+                            mStatusPanel.showTilesPanel();
+                            break;
+                    }
                 }
 
                 // Check for click actions
                 if (item != null && item.getView() != null && mCenterDistance < shadeTreshold) {
-                    if(mHapticFeedback) mVibrator.vibrate(2);
+                    if(hapticFeedback) mVibrator.vibrate(3);
                     item.getView().performClick();
                 }
             }
@@ -955,20 +932,22 @@ public class PieMenu extends FrameLayout {
         } else if (MotionEvent.ACTION_MOVE == action) {
 
             boolean snapActive = false;
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 4; i++) {
                 SnapPoint snap = mSnapPoint[i];                
                 float snapDistanceX = snap.x-x;
                 float snapDistanceY = snap.y-y;
                 float snapDistance = (float)Math.sqrt(Math.pow(snapDistanceX, 2) + Math.pow(snapDistanceY, 2));
 
-                if (snapDistance < mSnapRadius) {
-                    snap.alpha = 60;
+                // Do not show centerpoint snap point
+                if (mCenter.x == snap.x && mCenter.y == snap.y) {
+                    snap.alpha = 0x00;
+                    snap.active = false;
+                } else if (snapDistance < mSnapRadius) {
+                    snap.alpha = 50;
                     if (!snap.active) {
                         mAnimators[ANIMATOR_SNAP_WOBBLE].cancel();
                         mAnimators[ANIMATOR_SNAP_WOBBLE].animator.start();
-                        mAnimators[ANIMATOR_SNAP_GROW].cancel();
-                        mAnimators[ANIMATOR_SNAP_GROW].animator.start();
-                        if(mHapticFeedback) mVibrator.vibrate(2);
+                        if(hapticFeedback) mVibrator.vibrate(3);
                     }
                     snap.active = true;
                     snapActive = true;
@@ -978,15 +957,14 @@ public class PieMenu extends FrameLayout {
                 } else {
                     if (snap.active) {
                         mAnimators[ANIMATOR_SNAP_WOBBLE].cancel();
-                        mAnimators[ANIMATOR_SNAP_GROW].cancel();
                     }
-                    snap.alpha = 30;
+                    snap.alpha = 10;
                     snap.active = false;
                 }
             }
 
             // Trigger the shades?
-            if (mCenterDistance > shadeTreshold) {
+            if (!snapActive && mCenterDistance > shadeTreshold) {
                 int state = -1;
                 switch (mPanelOrientation) {
                     case Gravity.BOTTOM:
@@ -1011,14 +989,14 @@ public class PieMenu extends FrameLayout {
                         mGlowOffsetRight = mPanelOrientation != Gravity.TOP ? 150 : 255;;
                         mGlowOffsetLeft = mPanelOrientation != Gravity.TOP ? 255 : 150;
                         mStatusPanel.setFlipViewState(PieStatusPanel.QUICK_SETTINGS_PANEL);
-                        if (mHapticFeedback && !snapActive) mVibrator.vibrate(2);
+                        if(hapticFeedback) mVibrator.vibrate(2);
                     } else if (state == PieStatusPanel.NOTIFICATIONS_PANEL && 
                             mStatusPanel.getFlipViewState() != PieStatusPanel.NOTIFICATIONS_PANEL
                             && mStatusPanel.getCurrentViewState() != PieStatusPanel.NOTIFICATIONS_PANEL) {
                         mGlowOffsetRight = mPanelOrientation != Gravity.TOP ? 255 : 150;
                         mGlowOffsetLeft = mPanelOrientation != Gravity.TOP ? 150 : 255;
                         mStatusPanel.setFlipViewState(PieStatusPanel.NOTIFICATIONS_PANEL);
-                        if (mHapticFeedback && !snapActive) mVibrator.vibrate(2);
+                        if(hapticFeedback) mVibrator.vibrate(2);
                     }
                 }
                 deselect();

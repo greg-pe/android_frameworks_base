@@ -191,7 +191,7 @@ public class PieStatusPanel {
                 mPanel.invalidate();
             }
         });
-        alphAnimation.setDuration(600);
+        alphAnimation.setDuration(1000);
         alphAnimation.setInterpolator(new DecelerateInterpolator());
         alphAnimation.start();
 

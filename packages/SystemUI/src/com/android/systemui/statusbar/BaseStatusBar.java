@@ -197,7 +197,7 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
-        if (mPieControlPanel != null) mPieControlPanel.bumpConfiguration();
+        if (mPieControlPanel != null) mPieControlPanel.onConfigurationChanged(newConfig);
     }
 
     public QuickSettingsContainerView getQuickSettingsPanel() {
@@ -288,8 +288,6 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     private class PieControlsTouchListener implements View.OnTouchListener {
         private int orient;
-        private boolean actionDown = false;
-        private boolean centerPie = true;
         private float initialX = 0;
         private float initialY = 0;
         int index;
@@ -306,26 +304,19 @@ public abstract class BaseStatusBar extends SystemUI implements
             if (!mPieControlPanel.isShowing()) {
                 switch(action) {
                     case MotionEvent.ACTION_DOWN:
-                        centerPie = Settings.System.getInt(mContext.getContentResolver(), Settings.System.PIE_CENTER, 1) == 1;
-                        actionDown = true;
                         initialX = event.getX();
                         initialY = event.getY();
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if (actionDown != true) break;
-
                         float deltaX = Math.abs(event.getX() - initialX);
                         float deltaY = Math.abs(event.getY() - initialY);
                         float distance = orient == Gravity.BOTTOM ||
                                 orient == Gravity.TOP ? deltaY : deltaX;
                         // Swipe up
                         if (distance > 10) {
-                            orient = mPieControlPanel.getOrientation();
-                            mPieControlPanel.show(centerPie ? -1 : (int)(orient == Gravity.BOTTOM ||
-                                orient == Gravity.TOP ? initialX : initialY));
+                            mPieControlPanel.show(true);
                             event.setAction(MotionEvent.ACTION_DOWN);
                             mPieControlPanel.onTouchEvent(event);
-                            actionDown = false;
                         }
                 }
             } else {
