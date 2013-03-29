@@ -82,6 +82,7 @@ public class PieStatusPanel {
 
         mContentFrame = (View) mPanel.getBar().mContainer.findViewById(R.id.content_frame);
         mScrollView = (ScrollView) mPanel.getBar().mContainer.findViewById(R.id.content_scroll);
+<<<<<<< HEAD
         mScrollView.setOnTouchListener(new ViewOnTouchListener());
         mContentFrame.setOnTouchListener(new ViewOnTouchListener());
 
@@ -90,6 +91,10 @@ public class PieStatusPanel {
 
     class ViewOnTouchListener implements OnTouchListener {
         final int SCROLLING_DISTANCE_TRIGGER = 100;
+=======
+        mScrollView.setOnTouchListener(new OnTouchListener(){
+            final int SCROLLING_DISTANCE_TRIGGER = 100;
+>>>>>>> parent of 357aa05... PIE: Panels are centered and have margins
             float scrollX;
             float scrollY;
             boolean hasScrolled;
@@ -212,12 +217,6 @@ public class PieStatusPanel {
 
     private void updateContainer(boolean visible) {
         mPanel.getBar().mContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
-        updatePanelConfiguration();
-    }
-
-    public void updatePanelConfiguration() {
-        int padding = mContext.getResources().getDimensionPixelSize(R.dimen.pie_panel_padding);
-        mScrollView.setPadding(padding,0,padding,0);
     }
 
     public static WindowManager.LayoutParams getFlipPanelLayoutParams() {

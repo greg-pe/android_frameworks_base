@@ -27,7 +27,6 @@ import android.animation.TimeInterpolator;
 import android.database.ContentObserver;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -558,10 +557,6 @@ public class PieMenu extends FrameLayout {
     public void init() {
         mStatusPanel = new PieStatusPanel(mContext, mPanel);
         getNotifications();
-    }
-
-    public void onConfigurationChanged() {
-        if (mStatusPanel != null) mStatusPanel.updatePanelConfiguration();
     }
 
     public PieStatusPanel getStatusPanel() {
